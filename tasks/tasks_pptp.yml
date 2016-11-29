@@ -22,10 +22,10 @@
 
   - name: PPTP | Keys in sysctl.conf
     sysctl: name={{item.name}} value={{item.value}} ignoreerrors=yes state={{item.state | default('present')}}
-    with_items: "{{ pptp_sysctl_conf_lines | default()}}"
-      become: yes
-      tags:
-        - pptpd
+    with_items: "{{ pptp_sysctl_conf_lines | default([])}}"
+    become: yes
+    tags:
+      - pptpd
 
   - name: PPTP | Keys in sysctl.conf (apply)
     shell: sysctl --system
@@ -43,7 +43,7 @@
       - pptpd
 
   - name: PPTP | Template pptp users in /etc/ppp/chap-secrets
-    template: src="{{role_dir}}/templates/chap-secrets.js" dest="/etc/ppp/chap-secrets"
+    template: src="{{role_dir}}/templates/chap-secrets.j2" dest="/etc/ppp/chap-secrets"
     become: yes
     tags:
       - pptpd

@@ -17,8 +17,8 @@ pptp_local_ip: "{{ ansible_default_ipv4.address }}"
 pptp_remote_ip: "{{pptp_remote_network}}.234-{{pptp_remote_network}}.245"
 
 pptpd_options_properties:
-    - {regexp: "^ms-dns (.*) #1$", line: "ms-dns 8.8.8.8 #1", insertafter="^(.*)See KB311218(/*)" }
-    - {regexp: "^ms-dns (.*) #2$", line: "ms-dns 8.8.4.4 #2", insertafter="^(.*)See KB311218(/*)" }
+    - {regexp: "^ms-dns (.*) #1$", line: "ms-dns 8.8.8.8 #1", insertafter="^#ms-dns 10.0.0.2(.*)" }
+    - {regexp: "^ms-dns (.*) #2$", line: "ms-dns 8.8.4.4 #2", insertafter="^#ms-dns 10.0.0.2(.*)" }
 
 pptpd_conf_properties:
     - {regexp: "^#?local_ip (.*)", line: "local_ip {{pptp_local_ip}}"  }

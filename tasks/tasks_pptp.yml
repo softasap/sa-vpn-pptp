@@ -42,6 +42,50 @@
     tags:
       - pptpd
 
+  - name: PPTP | iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+    shell: iptables -t nat -A POSTROUTING -o {{pptp_interface}} -j MASQUERADE
+    when: (firewall_used is not defined) or firewall_used == 'iptables'
+    become: yes
+    tags:
+      - pptpd
+
+  - name: PPTP | iptables-save
+    shell: iptables-save
+    when: (firewall_used is not defined) or firewall_used == 'iptables'
+    become: yes
+    tags:
+      - pptpd
+
+  - name: PPTP | /etc/ufw/before.rules
+    blockinfile:
+      dest: /etc/ufw/before.rules
+      insertbefore: "^# Don't delete these required lines, otherwise there will be errors$"
+      block: |
+       # NAT table rules
+       *nat
+       :POSTROUTING ACCEPT [0:0]
+
+       # Forward traffic through eth0 - Change to match you out-interface
+       -A POSTROUTING -s {{pptp_remote_network}}.0/24 -o {{pptp_interface}} -j MASQUERADE
+
+       # don't delete the 'COMMIT' line or these nat table rules won't
+       # be processed
+       COMMIT
+    when: firewall_used == 'ufw'
+    become: yes
+    tags:
+      - pptpd
+
+# DEFAULT_FORWARD_POLICY in /etc/default/ufw ?
+
+  - name: PPTP | ufw apply
+    shell: ufw disable && ufw enable
+    when: firewall_used == 'ufw'
+    become: yes
+    tags:
+      - pptpd
+
+
   - name: PPTP | Template pptp users in /etc/ppp/chap-secrets
     template: src="{{role_dir}}/templates/chap-secrets.j2" dest="/etc/ppp/chap-secrets"
     become: yes

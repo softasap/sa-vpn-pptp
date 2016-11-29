@@ -14,11 +14,12 @@ pptp_vpn_users:
 
 pptp_remote_network: 192.168.0
 pptp_local_ip: "{{ ansible_default_ipv4.address }}"
-pptp_remote_ip: "{{pptp_remote_network}}.234-{{pptp_remote_network}}.245"
+pptp_remote_ip: "{{pptp_remote_network}}.234-245"
+pptp_interface: eth0
 
 pptpd_options_properties:
-    - {regexp: "^ms-dns (.*) #1$", line: "ms-dns 8.8.8.8 #1", insertafter="^#ms-dns 10.0.0.2(.*)" }
-    - {regexp: "^ms-dns (.*) #2$", line: "ms-dns 8.8.4.4 #2", insertafter="^#ms-dns 10.0.0.2(.*)" }
+    - {regexp: "^ms-dns (.*) #1$", line: "ms-dns 8.8.8.8 #1", insertafter="^#ms-dns(.*)" }
+    - {regexp: "^ms-dns (.*) #2$", line: "ms-dns 8.8.4.4 #2", insertafter="^#ms-dns(.*)" }
 
 pptpd_conf_properties:
     - {regexp: "^#?local_ip (.*)", line: "local_ip {{pptp_local_ip}}"  }
@@ -31,4 +32,4 @@ pptp_sysctl_conf_lines:
       value: "1"
     }
 
-pptp_firewall: ufw # ufw | iptables
+pptp_firewall: iptables  # ufw 

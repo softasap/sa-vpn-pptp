@@ -1,0 +1,55 @@
+---
+
+  - name: PPTP | Install package
+    apt: pkg=pptpd
+    become: yes
+    tags:
+      - pptpd
+
+  - name: PPTP | patch /etc/ppp/pptpd-options
+    lineinfile: dest=/etc/ppp/pptpd-options  regexp="{{item.regexp}}" line="{{item.line}}" insertafter="{{item.insertafter | default('EOF')}}"
+    with_items: "{{pptpd_options_properties | default([])}}"
+    become: yes
+    tags:
+      - pptpd
+
+  - name: PPTP | patch /etc/pptpd.conf
+    lineinfile: dest=/etc/pptpd.conf  regexp="{{item.regexp}}" line="{{item.line}}" insertafter="{{item.insertafter | default('EOF')}}"
+    with_items: "{{pptpd_conf_properties | default([])}}"
+    become: yes
+    tags:
+      - pptpd
+
+  - name: PPTP | Keys in sysctl.conf
+    sysctl: name={{item.name}} value={{item.value}} ignoreerrors=yes state={{item.state | default('present')}}
+    with_items: "{{ pptp_sysctl_conf_lines | default()}}"
+      become: yes
+      tags:
+        - pptpd
+
+  - name: PPTP | Keys in sysctl.conf (apply)
+    shell: sysctl --system
+    become: yes
+    tags:
+      - pptpd
+
+# https://lists.debian.org/debian-kernel/2016/09/msg00150.html
+# Who uses old kernels now ? We are targeting new one
+
+  - name: PPTP | Enable nf_conntrack_pptp /etc/modules-load.d/pptp.conf
+    lineinfile: dest=/etc/modules-load.d/pptp.conf create=yes regexp="^nf_conntrack_pptp$" line="nf_conntrack_pptp"
+    become: yes
+    tags:
+      - pptpd
+
+  - name: PPTP | Template pptp users in /etc/ppp/chap-secrets
+    template: src="{{role_dir}}/templates/chap-secrets.js" dest="/etc/ppp/chap-secrets"
+    become: yes
+    tags:
+      - pptpd
+
+  - name: PPTP | Restart service
+    service: name="pptpd" state="restarted" enabled="yes"
+    become: yes
+    tags:
+      - pptpd

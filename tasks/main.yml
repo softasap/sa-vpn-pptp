@@ -1,0 +1,3 @@
+---
+# tasks file for sa-vpn-pptp
+  - include: tasks_pptp.yml

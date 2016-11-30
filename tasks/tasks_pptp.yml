@@ -71,7 +71,7 @@
        # don't delete the 'COMMIT' line or these nat table rules won't
        # be processed
        COMMIT
-    when: firewall_used == 'ufw'
+    when: (firewall_used is defined) and firewall_used == 'ufw'
     become: yes
     tags:
       - pptpd
@@ -80,7 +80,7 @@
 
   - name: PPTP | ufw apply
     shell: ufw disable && ufw enable
-    when: firewall_used == 'ufw'
+    when: (firewall_used is defined) and firewall_used == 'ufw'
     become: yes
     tags:
       - pptpd

@@ -32,4 +32,4 @@ pptp_sysctl_conf_lines:
       value: "1"
     }
 
-pptp_firewall: iptables  # ufw 
+firewall_used: ufw  # ufw

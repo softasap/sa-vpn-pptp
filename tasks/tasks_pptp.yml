@@ -94,6 +94,7 @@
 
   - name: PPTP | Restart service
     service: name="pptpd" state="restarted" enabled="yes"
+    when: docker_test is not defined
     become: yes
     tags:
       - pptpd

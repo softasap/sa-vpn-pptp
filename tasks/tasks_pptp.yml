@@ -79,7 +79,7 @@
 # DEFAULT_FORWARD_POLICY in /etc/default/ufw ?
 
   - name: PPTP | ufw apply
-    shell: ufw disable && ufw enable
+    shell: ufw --force disable && ufw --force enable
     when: (firewall_used is defined) and firewall_used == 'ufw'
     become: yes
     tags:

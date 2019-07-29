@@ -23,15 +23,19 @@
   - name: PPTP | Keys in sysctl.conf
     sysctl: name={{item.name}} value={{item.value}} ignoreerrors=yes state={{item.state | default('present')}}
     with_items: "{{ pptp_sysctl_conf_lines | default([])}}"
+    when: docker_test is not defined
+    register: sysctl_keys_result
     become: yes
     tags:
       - pptpd
 
   - name: PPTP | Keys in sysctl.conf (apply)
     shell: sysctl --system
+    when: docker_test is not defined and sysctl_keys_result.changed
     become: yes
     tags:
       - pptpd
+      - skip_ansible_lint
 
 # https://lists.debian.org/debian-kernel/2016/09/msg00150.html
 # Who uses old kernels now ? We are targeting new one
@@ -48,6 +52,7 @@
     become: yes
     tags:
       - pptpd
+      - skip_ansible_lint
 
   - name: PPTP | iptables-save
     shell: iptables-save
@@ -55,6 +60,7 @@
     become: yes
     tags:
       - pptpd
+      - skip_ansible_lint
 
   - name: PPTP | /etc/ufw/before.rules
     blockinfile:
